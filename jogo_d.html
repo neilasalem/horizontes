@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogo 4 · Frações no Cotidiano — Coleção Horizonte</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-container {
+      max-width: 1040px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .challenge-workspace-d {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      align-items: center;
+      gap: 36px;
+      margin: 20px 0;
+    }
+
+    /* Pacote de Produto Ilustrado Estilo HQ */
+    .product-package-card {
+      position: relative;
+      width: 220px;
+      height: 320px;
+      margin: 0 auto;
+      border: 3.5px solid var(--horizon-ink);
+      border-radius: 20px;
+      background: linear-gradient(165deg, #1f4287 0%, #fff8e8 25%, #fff8e8 75%, #102e6a 100%);
+      box-shadow: 6px 6px 0 var(--horizon-ink);
+      transform: rotate(-2deg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .product-package-card:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+
+    .product-badge-brand {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fff;
+      background: var(--horizon-ink);
+      padding: 4px 10px;
+      border-radius: 999px;
+      align-self: center;
+    }
+
+    .product-icon-center {
+      font-size: 4.5rem;
+      line-height: 1;
+      filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.2));
+      margin: 8px 0;
+    }
+
+    .product-name-label {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--horizon-ink);
+      line-height: 1.2;
+    }
+
+    .product-weight-stamp {
+      display: inline-block;
+      align-self: center;
+      padding: 6px 14px;
+      background: var(--horizon-yellow);
+      border: 2px solid var(--horizon-ink);
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 2px 2px 0 var(--horizon-ink);
+    }
+
+    /* Grade de Botões de Resposta */
+    .answers-grid-d {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .btn-answer-choice {
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      border: 3px solid var(--horizon-ink);
+      border-radius: 18px;
+      color: #ffffff;
+      font-family: var(--font-heading);
+      font-size: clamp(1.8rem, 3.8vw, 2.8rem);
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--horizon-ink);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-answer-choice:nth-child(1) { background: #009cc3; }
+    .btn-answer-choice:nth-child(2) { background: #e63946; }
+    .btn-answer-choice:nth-child(3) { background: #f28c4b; }
+    .btn-answer-choice:nth-child(4) { background: #2a9d8f; }
+
+    .btn-answer-choice:hover:not(:disabled) {
+      transform: translate(-3px, -3px);
+      box-shadow: 7px 7px 0 var(--horizon-ink);
+      filter: brightness(1.06);
+    }
+
+    .btn-answer-choice:disabled {
+      cursor: default;
+    }
+
+    .btn-answer-choice.correct {
+      box-shadow: 0 0 0 6px var(--horizon-yellow), 6px 6px 0 var(--horizon-ink);
+      animation: comicPop 0.4s ease;
+      filter: brightness(1.1);
+    }
+
+    .btn-answer-choice.wrong {
+      filter: grayscale(0.5) brightness(0.9);
+      animation: comicShake 0.4s ease;
+    }
+
+    .unit-subtext {
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0.95;
+    }
+
+    /* Dica de Passo a Passo do Cálculo */
+    .step-by-step-box {
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: #edf7fa;
+      border: 2px dashed #009cc3;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #06546b;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .challenge-workspace-d {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .product-package-card {
+        height: 240px;
+        width: 170px;
+      }
+      .product-icon-center {
+        font-size: 3.5rem;
+      }
+      .answers-grid-d {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .btn-answer-choice {
+        min-height: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="game-container">
+    <section class="comic-board" id="game-section">
+      <div class="comic-board-header">
+        <span class="comic-badge-pill">Jogo 4 · Aplicações Práticas</span>
+        <h1 class="comic-game-title" id="question-title">Quanto é 1/4 de 700g de farinha?</h1>
+        <p class="comic-instruction">Calcule a parte fracionária da quantidade indicada no pacote.</p>
+      </div>
+
+      <!-- Barra de Progresso do Jogo -->
+      <div class="comic-progress-container">
+        <div class="comic-progress-track">
+          <div class="comic-progress-fill" id="progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="comic-progress-label" id="round-indicator">Desafio 1 de 8</div>
+      </div>
+
+      <!-- Área de Desafio Interativo -->
+      <div class="challenge-workspace-d">
+        <!-- Cartão do Produto -->
+        <div class="product-package-card" id="product-card">
+          <span class="product-badge-brand" id="product-brand">Coleção Horizonte</span>
+          <div class="product-icon-center" id="product-symbol">🌾</div>
+          <div class="product-name-label" id="product-name">Farinha de Trigo</div>
+          <div class="product-weight-stamp" id="product-weight">700 g</div>
+        </div>
+
+        <!-- Grade de Respostas -->
+        <div>
+          <div class="answers-grid-d" id="answers-container" role="group" aria-label="Escolha a resposta correta"></div>
+          <div class="step-by-step-box" id="step-by-step"></div>
+        </div>
+      </div>
+
+      <!-- Mascote Garota Exploradora com Dicas e Passo a Passo -->
+      <div class="mascot-feedback-box" id="mascot-box">
+        <div class="mascot-avatar-frame">
+          <img src="assets/explorer_avatar.jpg" alt="Exploradora Nina" class="mascot-avatar-img">
+        </div>
+        <div class="mascot-speech-content">
+          <div class="mascot-speech-name">Exploradora Nina · Dica de Cálculo</div>
+          <div class="mascot-speech-text" id="mascot-speech">
+            Para achar a fração de um total: divida o total pelo número de baixo (denominador) e multiplique pelo de cima (numerador)!
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão de Próximo Desafio -->
+      <button type="button" class="btn-comic-primary" id="btn-next" style="display: none; margin-top: 16px;">
+        Próximo Desafio →
+      </button>
+    </section>
+
+    <!-- Tela de Conclusão / Vitória -->
+    <section class="comic-board comic-finish-card" id="finish-section" style="display: none;">
+      <div class="finish-mascot-row">
+        <div class="finish-mascot-avatar">
+          <img src="assets/robot_avatar.jpg" alt="Robô">
+        </div>
+        <div class="finish-mascot-avatar">
+          <img src="assets/explorer_avatar.jpg" alt="Exploradora">
+        </div>
+      </div>
+      <h2 class="finish-title">Mestre das Frações no Dia a Dia!</h2>
+      <p style="font-size: 1.15rem; color: #3f5564; max-width: 600px; margin: 0 auto 16px;">
+        Você resolveu todas as situações cotidianas com cálculos rápidos de medidas, gramas e litros!
+      </p>
+      <div class="finish-score-badge" id="finish-score-text">
+        ★ Total Conquistado: 80 pontos
+      </div>
+      <div class="finish-buttons-group">
+        <button type="button" class="btn-comic-primary" id="btn-restart">Jogar Novamente ↻</button>
+        <a href="index.html" class="btn-comic-secondary" style="width: 100%;">Voltar ao Portal Inicial 🏠</a>
+      </div>
+    </section>
+
+    <footer class="horizonte-footer">
+      Coleção Horizonte · Matemática das Frações
+    </footer>
+  </main>
+
+  <script src="shared.js"></script>
+  <script>
+    const CHALLENGES = [
+      {
+        product: 'Farinha de Trigo',
+        quantity: 700,
+        unit: 'g',
+        numerator: 1,
+        denominator: 4,
+        symbol: '🌾',
+        bg: 'linear-gradient(165deg, #1f4287 0%, #fff8e8 25%, #fff8e8 75%, #102e6a 100%)'
+      },
+      {
+        product: 'Arroz Especial',
+        quantity: 1000,
+        unit: 'g',
+        numerator: 1,
+        denominator: 2,
+        symbol: '🍚',
+        bg: 'linear-gradient(165deg, #2a9d8f 0%, #fffdf5 25%, #fffdf5 75%, #18635a 100%)'
+      },
+      {
+        product: 'Leite Fresco',
+        quantity: 1000,
+        unit: 'mL',
+        numerator: 3,
+        denominator: 4,
+        symbol: '🥛',
+        bg: 'linear-gradient(165deg, #009cc3 0%, #ffffff 25%, #ffffff 75%, #055f75 100%)'
+      },
+      {
+        product: 'Barra de Chocolate',
+        quantity: 500,
+        unit: 'g',
+        numerator: 1,
+        denominator: 5,
+        symbol: '🍫',
+        bg: 'linear-gradient(165deg, #6b3e2e 0%, #fae8d4 25%, #fae8d4 75%, #422217 100%)'
+      },
+      {
+        product: 'Suco de Laranja',
+        quantity: 1500,
+        unit: 'mL',
+        numerator: 2,
+        denominator: 3,
+        symbol: '🍊',
+        bg: 'linear-gradient(165deg, #f28c4b 0%, #fff4df 25%, #fff4df 75%, #c45e1f 100%)'
+      },
+      {
+        product: 'Pacote de Açúcar',
+        quantity: 2000,
+        unit: 'g',
+        numerator: 3,
+        denominator: 4,
+        symbol: '🧂',
+        bg: 'linear-gradient(165deg, #e63946 0%, #fff5f5 25%, #fff5f5 75%, #961922 100%)'
+      },
+      {
+        product: 'Garrafa de Óleo',
+        quantity: 900,
+        unit: 'mL',
+        numerator: 2,
+        denominator: 5,
+        symbol: '🫗',
+        bg: 'linear-gradient(165deg, #ffd166 0%, #fffdf2 25%, #fffdf2 75%, #c79a24 100%)'
+      },
+      {
+        product: 'Feijão Carioca',
+        quantity: 1200,
+        unit: 'g',
+        numerator: 1,
+        denominator: 3,
+        symbol: '🫘',
+        bg: 'linear-gradient(165deg, #5b3a29 0%, #f7ebe1 25%, #f7ebe1 75%, #382015 100%)'
+      }
+    ];
+
+    const TOTAL_ROUNDS = CHALLENGES.length;
+    let currentRound = 0;
+    let score = 0;
+    let isSolved = false;
+
+    // Inicializa a barra de navegação com ID 'd'
+    HorizonteNav.init({ activeGame: 'd' });
+
+    function generateChoices(correctVal, unit) {
+      const choices = [correctVal];
+      const offsets = [
+        Math.round(correctVal * 0.5),
+        Math.round(correctVal * 1.5),
+        Math.round(correctVal + 50),
+        Math.round(correctVal - 50)
+      ];
+
+      for (let offset of offsets) {
+        if (offset > 0 && offset !== correctVal && !choices.includes(offset)) {
+          choices.push(offset);
+        }
+        if (choices.length === 4) break;
+      }
+
+      // Se ainda faltar, adiciona variações
+      let mult = 10;
+      while (choices.length < 4) {
+        let val = correctVal + mult;
+        if (!choices.includes(val)) choices.push(val);
+        mult += 25;
+      }
+
+      return choices.sort(() => Math.random() - 0.5);
+    }
+
+    function loadRound() {
+      isSolved = false;
+      document.getElementById('btn-next').style.display = 'none';
+      document.getElementById('step-by-step').style.display = 'none';
+
+      const data = CHALLENGES[currentRound];
+      const correctVal = Math.round((data.quantity / data.denominator) * data.numerator);
+
+      // Atualiza títulos e progresso
+      const pct = (currentRound / TOTAL_ROUNDS) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('round-indicator').textContent = `Desafio ${currentRound + 1} de ${TOTAL_ROUNDS}`;
+
+      document.getElementById('question-title').textContent = 
+        `Quanto é ${data.numerator}/${data.denominator} de ${data.quantity}${data.unit} de ${data.product.toLowerCase()}?`;
+
+      // Atualiza o pacote ilustrado
+      const card = document.getElementById('product-card');
+      card.style.background = data.bg;
+      document.getElementById('product-symbol').textContent = data.symbol;
+      document.getElementById('product-name').textContent = data.product;
+      document.getElementById('product-weight').textContent = `${data.quantity} ${data.unit}`;
+
+      // Mascote
+      const mascotBox = document.getElementById('mascot-box');
+      mascotBox.className = 'mascot-feedback-box';
+      document.getElementById('mascot-speech').textContent = 
+        `Divida o total de ${data.quantity} ${data.unit} por ${data.denominator}, e multiplique por ${data.numerator}. Qual é o resultado?`;
+
+      // Respostas
+      const container = document.getElementById('answers-container');
+      container.innerHTML = '';
+
+      const choices = generateChoices(correctVal, data.unit);
+      choices.forEach(val => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-answer-choice';
+        btn.innerHTML = `
+          <span>${val}</span>
+          <span class="unit-subtext">${data.unit}</span>
+        `;
+        btn.setAttribute('aria-label', `${val} ${data.unit}`);
+
+        btn.addEventListener('click', () => handleChoice(val, correctVal, btn, data));
+        container.appendChild(btn);
+      });
+    }
+
+    function handleChoice(val, correctVal, btn, data) {
+      if (isSolved) return;
+
+      const mascotBox = document.getElementById('mascot-box');
+      const speech = document.getElementById('mascot-speech');
+      const stepBox = document.getElementById('step-by-step');
+
+      if (val === correctVal) {
+        isSolved = true;
+        score += 10;
+        HorizonteNav.updateScore(score);
+        HorizonteAudio.playCorrect();
+
+        btn.classList.add('correct');
+        mascotBox.className = 'mascot-feedback-box correct';
+        speech.innerHTML = `<strong>Resposta Exata!</strong> ${val} ${data.unit}.`;
+
+        stepBox.style.display = 'block';
+        stepBox.innerHTML = `
+          <strong>💡 Demonstração do Cálculo:</strong><br>
+          1º Passo: Dividir pelo denominador ➔ ${data.quantity} ÷ ${data.denominator} = ${data.quantity / data.denominator} ${data.unit}<br>
+          2º Passo: Multiplicar pelo numerador ➔ ${data.quantity / data.denominator} × ${data.numerator} = <strong>${correctVal} ${data.unit}</strong>
+        `;
+
+        document.querySelectorAll('.btn-answer-choice').forEach(b => b.disabled = true);
+
+        const btnNext = document.getElementById('btn-next');
+        btnNext.textContent = (currentRound === TOTAL_ROUNDS - 1) ? 'Concluir Desafio ★' : 'Próximo Desafio →';
+        btnNext.style.display = 'inline-flex';
+        btnNext.focus();
+      } else {
+        HorizonteAudio.playWrong();
+        btn.classList.remove('wrong');
+        void btn.offsetWidth;
+        btn.classList.add('wrong');
+        mascotBox.className = 'mascot-feedback-box wrong';
+        speech.textContent = `Ainda não é ${val} ${data.unit}. Tente primeiro dividir ${data.quantity} por ${data.denominator}!`;
+      }
+    }
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      HorizonteAudio.playClick();
+      currentRound++;
+      if (currentRound >= TOTAL_ROUNDS) {
+        showFinish();
+      } else {
+        loadRound();
+      }
+    });
+
+    function showFinish() {
+      document.getElementById('game-section').style.display = 'none';
+      document.getElementById('finish-section').style.display = 'block';
+      document.getElementById('finish-score-text').textContent = `★ Total Conquistado: ${score} pontos!`;
+      HorizonteAudio.playFanfare();
+      HorizonteFX.celebrate();
+    }
+
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      HorizonteAudio.playClick();
+      currentRound = 0;
+      score = 0;
+      HorizonteNav.updateScore(score);
+      document.getElementById('finish-section').style.display = 'none';
+      document.getElementById('game-section').style.display = 'block';
+      loadRound();
+    });
+
+    loadRound();
+  </script>
+</body>
+</html>

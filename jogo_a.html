@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogo 1 · Fatia do Saber — Coleção Horizonte</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-container {
+      max-width: 980px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .workspace-a {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) 1.2fr;
+      align-items: center;
+      gap: 32px;
+      margin: 20px 0;
+    }
+
+    .pizza-visual-box {
+      text-align: center;
+      padding: 16px;
+      background: #fdfcf7;
+      border: 2px dashed #b7d6d1;
+      border-radius: 20px;
+    }
+
+    .pizza-visual-box svg {
+      width: 100%;
+      max-width: 270px;
+      filter: drop-shadow(4px 4px 0 #142d3d33);
+      transition: transform 0.3s ease;
+    }
+
+    .options-grid-a {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .btn-fraction-option {
+      min-height: 108px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: var(--horizon-card);
+      border: 3px solid #b7d6d1;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--horizon-ink);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-fraction-option:hover:not(:disabled) {
+      transform: translate(-3px, -3px);
+      box-shadow: 6px 6px 0 var(--horizon-ink);
+      background: var(--horizon-yellow-light);
+      border-color: var(--horizon-ink);
+    }
+
+    .btn-fraction-option:disabled {
+      cursor: default;
+    }
+
+    .btn-fraction-option.correct {
+      border-color: var(--horizon-green);
+      background: var(--horizon-green-light);
+      box-shadow: 4px 4px 0 var(--horizon-green);
+      animation: comicPop 0.4s ease;
+    }
+
+    .btn-fraction-option.wrong {
+      border-color: var(--horizon-red);
+      background: var(--horizon-red-light);
+      animation: comicShake 0.4s ease;
+    }
+
+    .fraction-display {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--horizon-ink);
+    }
+
+    .fraction-numerator {
+      min-width: 44px;
+      text-align: center;
+      padding-bottom: 5px;
+      border-bottom: 3px solid currentColor;
+    }
+
+    .fraction-denominator {
+      padding-top: 5px;
+      text-align: center;
+    }
+
+    .legend-helper {
+      margin-top: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #516b79;
+    }
+
+    @media (max-width: 720px) {
+      .workspace-a {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .options-grid-a {
+        grid-template-columns: 1fr;
+      }
+      .btn-fraction-option {
+        min-height: 84px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="game-container">
+    <section class="comic-board" id="game-section">
+      <div class="comic-board-header">
+        <span class="comic-badge-pill">Jogo 1 · Reconhecimento Visual</span>
+        <h1 class="comic-game-title" id="question-title">Qual é a fração correspondente?</h1>
+        <p class="comic-instruction">Conte quantas fatias laranjas estão marcadas em relação ao total da pizza.</p>
+      </div>
+
+      <!-- Barra de Progresso do Jogo -->
+      <div class="comic-progress-container">
+        <div class="comic-progress-track">
+          <div class="comic-progress-fill" id="progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="comic-progress-label" id="round-indicator">Desafio 1 de 8</div>
+      </div>
+
+      <!-- Área de Jogo Interativa -->
+      <div class="workspace-a">
+        <div class="pizza-visual-box">
+          <svg id="pizza-svg" viewBox="0 0 240 240" role="img" aria-label="Pizza de frações"></svg>
+          <div class="legend-helper">🟠 Fatias pintadas têm um ponto escuro no centro</div>
+        </div>
+
+        <div>
+          <div class="options-grid-a" id="options-container" role="group" aria-label="Opções de Frações"></div>
+        </div>
+      </div>
+
+      <!-- Mascote com Dicas e Feedback Falado -->
+      <div class="mascot-feedback-box" id="mascot-box">
+        <div class="mascot-avatar-frame">
+          <img src="assets/robot_avatar.jpg" alt="Robô Horizonte" class="mascot-avatar-img">
+        </div>
+        <div class="mascot-speech-content">
+          <div class="mascot-speech-name">Robô Horizonte · Dica Amiga</div>
+          <div class="mascot-speech-text" id="mascot-speech">
+            O número de cima (numerador) representa as fatias coloridas. O de baixo (denominador) é o total de fatias!
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão de Próximo Desafio -->
+      <button type="button" class="btn-comic-primary" id="btn-next" style="display: none; margin-top: 16px;">
+        Próximo Desafio →
+      </button>
+    </section>
+
+    <!-- Tela de Conclusão / Vitória -->
+    <section class="comic-board comic-finish-card" id="finish-section" style="display: none;">
+      <div class="finish-mascot-row">
+        <div class="finish-mascot-avatar">
+          <img src="assets/robot_avatar.jpg" alt="Robô">
+        </div>
+        <div class="finish-mascot-avatar">
+          <img src="assets/explorer_avatar.jpg" alt="Exploradora">
+        </div>
+      </div>
+      <h2 class="finish-title">Incrível! Jornada Concluída!</h2>
+      <p style="font-size: 1.15rem; color: #3f5564; max-width: 600px; margin: 0 auto 16px;">
+        Você dominou a leitura de fatias e agora entende como frações representam partes de um inteiro!
+      </p>
+      <div class="finish-score-badge" id="finish-score-text">
+        ★ Total Conquistado: 80 pontos
+      </div>
+      <div class="finish-buttons-group">
+        <button type="button" class="btn-comic-primary" id="btn-restart">Jogar Novamente ↻</button>
+        <a href="jogo_b.html" class="btn-comic-secondary" style="width: 100%;">Avançar para o Jogo 2: Figuras →</a>
+      </div>
+    </section>
+
+    <footer class="horizonte-footer">
+      Coleção Horizonte · Matemática das Frações
+    </footer>
+  </main>
+
+  <script src="shared.js"></script>
+  <script>
+    const TOTAL_ROUNDS = 8;
+    let round = 0;
+    let score = 0;
+    let numerator = 0;
+    let denominator = 4;
+    let solved = false;
+    let previous = "";
+
+    // Inicializa a barra de navegação com ID 'a'
+    HorizonteNav.init({ activeGame: 'a' });
+
+    function shuffle(items) {
+      const arr = [...items];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function createSvgElement(tag, attrs) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        el.setAttribute(k, v);
+      }
+      return el;
+    }
+
+    function drawPizza() {
+      const svg = document.getElementById("pizza-svg");
+      svg.innerHTML = "";
+      svg.setAttribute(
+        "aria-label",
+        `Pizza dividida em ${denominator} fatias iguais, com ${numerator} partes coloridas.`
+      );
+
+      // Fundo circular
+      svg.appendChild(createSvgElement("circle", {
+        cx: 120, cy: 120, r: 106,
+        fill: "#ffe7ad",
+        stroke: "#142d3d",
+        "stroke-width": "3.5"
+      }));
+
+      const radius = 98;
+      const cx = 120;
+      const cy = 120;
+
+      for (let i = 0; i < denominator; i++) {
+        const start = (i / denominator) * Math.PI * 2 - Math.PI / 2;
+        const end = ((i + 1) / denominator) * Math.PI * 2 - Math.PI / 2;
+        const middle = (start + end) / 2;
+
+        const x1 = cx + radius * Math.cos(start);
+        const y1 = cy + radius * Math.sin(start);
+        const x2 = cx + radius * Math.cos(end);
+        const y2 = cy + radius * Math.sin(end);
+
+        const isPainted = i < numerator;
+        const fillColor = isPainted ? "#f28c4b" : "#fffef8";
+
+        const path = createSvgElement("path", {
+          d: `M ${cx} ${cy} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`,
+          fill: fillColor,
+          stroke: "#142d3d",
+          "stroke-width": "2.5"
+        });
+        svg.appendChild(path);
+
+        if (isPainted) {
+          const dotRadius = radius * 0.65;
+          const dotX = cx + dotRadius * Math.cos(middle);
+          const dotY = cy + dotRadius * Math.sin(middle);
+          const dot = createSvgElement("circle", {
+            cx: dotX,
+            cy: dotY,
+            r: 5.5,
+            fill: "#142d3d"
+          });
+          svg.appendChild(dot);
+        }
+      }
+    }
+
+    function loadRound() {
+      solved = false;
+      document.getElementById("btn-next").style.display = "none";
+
+      // Aumenta a dificuldade gradualmente: 4, 6 e 8 fatias
+      denominator = round < 3 ? 4 : round < 6 ? 6 : 8;
+
+      let key;
+      do {
+        numerator = 1 + Math.floor(Math.random() * (denominator - 1));
+        key = `${numerator}/${denominator}`;
+      } while (key === previous);
+      previous = key;
+
+      // Atualiza progresso e textos
+      const pct = (round / TOTAL_ROUNDS) * 100;
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+      document.getElementById("round-indicator").textContent = `Desafio ${round + 1} de ${TOTAL_ROUNDS}`;
+
+      const mascotBox = document.getElementById("mascot-box");
+      mascotBox.className = "mascot-feedback-box";
+      document.getElementById("mascot-speech").textContent =
+        `Observe a pizza dividida em ${denominator} partes iguais. Quantas delas estão pintadas em laranja?`;
+
+      drawPizza();
+
+      // Gera opções seguras e sem repetição
+      const distractors = [];
+      for (let n = 1; n <= denominator; n++) {
+        if (n !== numerator) distractors.push(n);
+      }
+
+      const choices = shuffle([
+        numerator,
+        ...shuffle(distractors).slice(0, 3)
+      ]);
+
+      const container = document.getElementById("options-container");
+      container.innerHTML = "";
+
+      choices.forEach(val => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-fraction-option";
+        btn.setAttribute("aria-label", `${val} sobre ${denominator}`);
+        btn.innerHTML = `
+          <div class="fraction-display">
+            <span class="fraction-numerator">${val}</span>
+            <span class="fraction-denominator">${denominator}</span>
+          </div>
+        `;
+
+        btn.addEventListener("click", () => handleAnswer(val, btn));
+        container.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(value, btn) {
+      if (solved) return;
+
+      const mascotBox = document.getElementById("mascot-box");
+      const speech = document.getElementById("mascot-speech");
+
+      if (value === numerator) {
+        solved = true;
+        score += 10;
+        HorizonteNav.updateScore(score);
+        HorizonteAudio.playCorrect();
+
+        btn.classList.add("correct");
+        mascotBox.className = "mascot-feedback-box correct";
+        speech.innerHTML = `<strong>Sensacional!</strong> Exatamente ${numerator}/${denominator}. Há ${numerator} fatias coloridas de um total de ${denominator}!`;
+
+        document.querySelectorAll(".btn-fraction-option").forEach(b => b.disabled = true);
+
+        const btnNext = document.getElementById("btn-next");
+        btnNext.textContent = (round === TOTAL_ROUNDS - 1) ? "Concluir Desafio ★" : "Próximo Desafio →";
+        btnNext.style.display = "inline-flex";
+        btnNext.focus();
+      } else {
+        HorizonteAudio.playWrong();
+        btn.classList.remove("wrong");
+        void btn.offsetWidth;
+        btn.classList.add("wrong");
+        mascotBox.className = "mascot-feedback-box wrong";
+        speech.textContent = `Ainda não! A pizza tem ${denominator} fatias ao todo. Conte com cuidado as partes coloridas em laranja!`;
+      }
+    }
+
+    document.getElementById("btn-next").addEventListener("click", () => {
+      HorizonteAudio.playClick();
+      round++;
+      if (round >= TOTAL_ROUNDS) {
+        showFinish();
+      } else {
+        loadRound();
+      }
+    });
+
+    function showFinish() {
+      document.getElementById("game-section").style.display = "none";
+      document.getElementById("finish-section").style.display = "block";
+      document.getElementById("finish-score-text").textContent = `★ Total Conquistado: ${score} pontos!`;
+      HorizonteAudio.playFanfare();
+      HorizonteFX.celebrate();
+    }
+
+    document.getElementById("btn-restart").addEventListener("click", () => {
+      HorizonteAudio.playClick();
+      round = 0;
+      score = 0;
+      previous = "";
+      HorizonteNav.updateScore(score);
+      document.getElementById("finish-section").style.display = "none";
+      document.getElementById("game-section").style.display = "block";
+      loadRound();
+    });
+
+    // Inicia a primeira rodada
+    loadRound();
+  </script>
+</body>
+</html>

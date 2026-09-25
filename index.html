@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coleção Horizonte · Desafios de Frações</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .portal-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .hero-banner-card {
+      position: relative;
+      border: var(--horizon-border);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--horizon-shadow-lg);
+      background: #009cc3;
+      margin: 20px auto 30px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      min-height: 380px;
+    }
+
+    .hero-banner-image-wrapper {
+      position: relative;
+      height: 100%;
+      min-height: 320px;
+      border-right: 3px solid var(--horizon-ink);
+      overflow: hidden;
+    }
+
+    .hero-banner-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-banner-content {
+      padding: clamp(24px, 4vw, 40px);
+      background: var(--horizon-paper);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--horizon-yellow);
+      border: 2px solid var(--horizon-ink);
+      border-radius: 999px;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0 var(--horizon-ink);
+      margin-bottom: 12px;
+      align-self: flex-start;
+      transform: rotate(-1.5deg);
+    }
+
+    .hero-main-heading {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.05;
+      color: var(--horizon-ink);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .hero-description {
+      font-size: 1.1rem;
+      color: #3f5564;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    .hero-characters-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      background: var(--horizon-yellow-light);
+      border: 2px dashed var(--horizon-ink);
+      border-radius: 16px;
+    }
+
+    .hero-char-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--horizon-ink);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .hero-char-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-char-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--horizon-ink);
+    }
+
+    /* Grade dos 4 Jogos */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .game-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 26px;
+      border: var(--horizon-border);
+      border-radius: 22px;
+      background: var(--horizon-paper);
+      box-shadow: var(--horizon-shadow);
+      text-decoration: none;
+      color: var(--horizon-ink);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      overflow: hidden;
+    }
+
+    .game-card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 60px;
+      height: 60px;
+      clip-path: polygon(100% 0, 100% 100%, 0 0);
+      opacity: 0.85;
+      transition: transform 0.2s ease;
+    }
+
+    .game-card.card-pizza::after { background: var(--horizon-orange); }
+    .game-card.card-figures::after { background: var(--horizon-cyan); }
+    .game-card.card-domino::after { background: var(--horizon-yellow); }
+    .game-card.card-grocery::after { background: var(--horizon-green); }
+
+    .game-card:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 10px 10px 0 var(--horizon-ink);
+    }
+
+    .game-card:hover::after {
+      transform: scale(1.15);
+    }
+
+    .game-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .game-icon-box {
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border: 2px solid var(--horizon-ink);
+      border-radius: 16px;
+      box-shadow: 2px 2px 0 var(--horizon-ink);
+      flex-shrink: 0;
+    }
+
+    .card-pizza .game-icon-box { background: var(--horizon-orange-light); }
+    .card-figures .game-icon-box { background: #dff6fa; }
+    .card-domino .game-icon-box { background: var(--horizon-yellow-light); }
+    .card-grocery .game-icon-box { background: var(--horizon-green-light); }
+
+    .game-card-title {
+      font-family: var(--font-heading);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--horizon-ink);
+      line-height: 1.25;
+    }
+
+    .game-card-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--horizon-cyan-dark);
+      margin-bottom: 4px;
+    }
+
+    .game-card-desc {
+      font-size: 0.98rem;
+      color: #4b6373;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .game-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 2px dashed #d5e5e3;
+      padding-top: 14px;
+    }
+
+    .game-pill-skill {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #3b5060;
+    }
+
+    .btn-card-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--horizon-ink);
+      color: #ffffff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 12px;
+      transition: background 0.15s ease;
+    }
+
+    .game-card:hover .btn-card-action {
+      background: var(--horizon-cyan-dark);
+    }
+
+    @media (max-width: 860px) {
+      .hero-banner-card {
+        grid-template-columns: 1fr;
+      }
+      .hero-banner-image-wrapper {
+        border-right: none;
+        border-bottom: 3px solid var(--horizon-ink);
+        height: 220px;
+        min-height: auto;
+      }
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="portal-container">
+    <!-- Banner Principal da Capa Horizonte -->
+    <section class="hero-banner-card">
+      <div class="hero-banner-image-wrapper">
+        <img src="assets/cover_banner.jpg" alt="Ilustração da capa Horizonte com o Robô e a Garota exploradora na cidade moderna">
+      </div>
+      <div class="hero-banner-content">
+        <span class="hero-tag-badge">Coleção Horizonte · Matemática</span>
+        <h1 class="hero-main-heading">Horizonte das Frações</h1>
+        <p class="hero-description">
+          Aprenda frações de forma interativa, visual e divertida! Explore pizzas de frações, representações geométricas, dominós de equivalência e cálculos práticos do cotidiano.
+        </p>
+        <div class="hero-characters-row">
+          <div class="hero-char-avatar">
+            <img src="assets/robot_avatar.jpg" alt="Robô Amigo">
+          </div>
+          <div class="hero-char-avatar">
+            <img src="assets/explorer_avatar.jpg" alt="Garota Exploradora">
+          </div>
+          <div class="hero-char-text">
+            "Escolha um jogo abaixo para começar a jornada! Você pode voltar a esta página inicial a qualquer momento."
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grade dos 4 Jogos -->
+    <section class="games-grid" aria-label="Menu de Jogos">
+      
+      <!-- Jogo 1 -->
+      <a href="jogo_a.html" class="game-card card-pizza">
+        <div>
+          <div class="game-card-header">
+            <div class="game-icon-box">🍕</div>
+            <div>
+              <span class="game-card-tag">Jogo 1 · Reconhecimento Visual</span>
+              <h2 class="game-card-title">Fatia do Saber</h2>
+            </div>
+          </div>
+          <p class="game-card-desc">
+            Observe as fatias pintadas na pizza e identifique a fração correspondente entre as opções disponíveis.
+          </p>
+        </div>
+        <div class="game-card-footer">
+          <span class="game-pill-skill">🎯 Partes do Todo</span>
+          <span class="btn-card-action">Jogar Agora →</span>
+        </div>
+      </a>
+
+      <!-- Jogo 2 -->
+      <a href="jogo_b.html" class="game-card card-figures">
+        <div>
+          <div class="game-card-header">
+            <div class="game-icon-box">📐</div>
+            <div>
+              <span class="game-card-tag">Jogo 2 · Formas Geométricas</span>
+              <h2 class="game-card-title">Encontre a Figura</h2>
+            </div>
+          </div>
+          <p class="game-card-desc">
+            Dada uma fração numérica em destaque, descubra qual das malhas geométricas e figuras representa exatamente esse valor.
+          </p>
+        </div>
+        <div class="game-card-footer">
+          <span class="game-pill-skill">🧩 Malhas e Proporções</span>
+          <span class="btn-card-action">Jogar Agora →</span>
+        </div>
+      </a>
+
+      <!-- Jogo 3 -->
+      <a href="jogo_c.html" class="game-card card-domino">
+        <div>
+          <div class="game-card-header">
+            <div class="game-icon-box">🁠</div>
+            <div>
+              <span class="game-card-tag">Jogo 3 · Frações Equivalentes</span>
+              <h2 class="game-card-title">Dominó das Frações</h2>
+            </div>
+          </div>
+          <p class="game-card-desc">
+            Conecte peças de dominó com a mesma proporção. Arraste ou clique na peça correspondente para avançar no caminho.
+          </p>
+        </div>
+        <div class="game-card-footer">
+          <span class="game-pill-skill">🔗 Equivalência</span>
+          <span class="btn-card-action">Jogar Agora →</span>
+        </div>
+      </a>
+
+      <!-- Jogo 4 -->
+      <a href="jogo_d.html" class="game-card card-grocery">
+        <div>
+          <div class="game-card-header">
+            <div class="game-icon-box">🛒</div>
+            <div>
+              <span class="game-card-tag">Jogo 4 · Aplicações Práticas</span>
+              <h2 class="game-card-title">Frações no Cotidiano</h2>
+            </div>
+          </div>
+          <p class="game-card-desc">
+            Resolva situações do dia a dia com pacotes de farinha, arroz, leite e suco calculando partes de quantidades reais em gramas e mililitros.
+          </p>
+        </div>
+        <div class="game-card-footer">
+          <span class="game-pill-skill">⚖️ Medidas e Cálculos</span>
+          <span class="btn-card-action">Jogar Agora →</span>
+        </div>
+      </a>
+
+    </section>
+
+    <footer class="horizonte-footer">
+      Coleção Horizonte · Matemática das Frações
+    </footer>
+  </main>
+
+  <script src="shared.js"></script>
+  <script>
+    HorizonteNav.init({ activeGame: 'home' });
+
+    document.querySelectorAll('.game-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        HorizonteAudio.playClick();
+      });
+    });
+  </script>
+</body>
+</html>

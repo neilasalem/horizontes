@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogo 2 · Encontre a Figura — Coleção Horizonte</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-container {
+      max-width: 980px;
+      margin: 20px auto 40px;
+      padding: 0 16px;
+    }
+
+    .target-fraction-container {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0 24px;
+    }
+
+    .target-fraction-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 34px;
+      background: var(--horizon-yellow);
+      border: 3px solid var(--horizon-ink);
+      border-radius: 20px;
+      box-shadow: 4px 4px 0 var(--horizon-ink);
+      transform: rotate(-1deg);
+    }
+
+    .target-label {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--horizon-ink);
+    }
+
+    .target-fraction-value {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: var(--font-heading);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--horizon-ink);
+    }
+
+    .target-numerator {
+      min-width: 48px;
+      text-align: center;
+      padding-bottom: 5px;
+      border-bottom: 3.5px solid currentColor;
+    }
+
+    .target-denominator {
+      padding-top: 5px;
+      text-align: center;
+    }
+
+    .figures-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 20px 0;
+    }
+
+    .figure-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 160px;
+      padding: 16px 12px;
+      background: var(--horizon-card);
+      border: 3px solid #b7d6d1;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--horizon-ink);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .figure-option-btn:hover:not(:disabled) {
+      transform: translate(-3px, -3px);
+      box-shadow: 7px 7px 0 var(--horizon-ink);
+      background: var(--horizon-yellow-light);
+      border-color: var(--horizon-ink);
+    }
+
+    .figure-option-btn:disabled {
+      cursor: default;
+    }
+
+    .figure-option-btn.correct {
+      border-color: var(--horizon-green);
+      background: var(--horizon-green-light);
+      box-shadow: 4px 4px 0 var(--horizon-green);
+      animation: comicPop 0.4s ease;
+    }
+
+    .figure-option-btn.wrong {
+      border-color: var(--horizon-red);
+      background: var(--horizon-red-light);
+      animation: comicShake 0.4s ease;
+    }
+
+    .figure-option-btn svg {
+      width: 100%;
+      max-width: 165px;
+      height: auto;
+      display: block;
+    }
+
+    .figure-caption {
+      margin-top: 8px;
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #516b79;
+    }
+
+    @media (max-width: 768px) {
+      .figures-grid {
+        grid-template-columns: 1fr;
+      }
+      .figure-option-btn {
+        flex-direction: row;
+        justify-content: space-around;
+        min-height: 110px;
+      }
+      .figure-option-btn svg {
+        max-width: 130px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="game-container">
+    <section class="comic-board" id="game-section">
+      <div class="comic-board-header">
+        <span class="comic-badge-pill">Jogo 2 · Formas Geométricas</span>
+        <h1 class="comic-game-title" id="question-title">Qual figura representa a fração?</h1>
+        <p class="comic-instruction">Veja o valor em destaque e escolha a figura geométrica com a proporção exata.</p>
+      </div>
+
+      <!-- Barra de Progresso do Jogo -->
+      <div class="comic-progress-container">
+        <div class="comic-progress-track">
+          <div class="comic-progress-fill" id="progress-bar" style="width: 0%;"></div>
+        </div>
+        <div class="comic-progress-label" id="round-indicator">Desafio 1 de 8</div>
+      </div>
+
+      <!-- Cartão da Fração Alvo -->
+      <div class="target-fraction-container">
+        <div class="target-fraction-card">
+          <span class="target-label">Encontre a figura de:</span>
+          <div class="target-fraction-value">
+            <span class="target-numerator" id="target-num">1</span>
+            <span class="target-denominator" id="target-den">2</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grade de Figuras Interativas -->
+      <div class="figures-grid" id="figures-container" role="group" aria-label="Escolha a figura correspondente"></div>
+
+      <!-- Mascote Garota Exploradora com Dicas -->
+      <div class="mascot-feedback-box" id="mascot-box">
+        <div class="mascot-avatar-frame">
+          <img src="assets/explorer_avatar.jpg" alt="Exploradora Horizonte" class="mascot-avatar-img">
+        </div>
+        <div class="mascot-speech-content">
+          <div class="mascot-speech-name">Exploradora Nina · Mapa de Frações</div>
+          <div class="mascot-speech-text" id="mascot-speech">
+            Conte quantas partes estão divididas cada figura e quantas estão coloridas em laranja!
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão de Próximo Desafio -->
+      <button type="button" class="btn-comic-primary" id="btn-next" style="display: none; margin-top: 16px;">
+        Próximo Desafio →
+      </button>
+    </section>
+
+    <!-- Tela de Conclusão / Vitória -->
+    <section class="comic-board comic-finish-card" id="finish-section" style="display: none;">
+      <div class="finish-mascot-row">
+        <div class="finish-mascot-avatar">
+          <img src="assets/robot_avatar.jpg" alt="Robô">
+        </div>
+        <div class="finish-mascot-avatar">
+          <img src="assets/explorer_avatar.jpg" alt="Exploradora">
+        </div>
+      </div>
+      <h2 class="finish-title">Missão Geográfica Concluída!</h2>
+      <p style="font-size: 1.15rem; color: #3f5564; max-width: 600px; margin: 0 auto 16px;">
+        Você explorou diferentes formas e malhas geométricas com total precisão!
+      </p>
+      <div class="finish-score-badge" id="finish-score-text">
+        ★ Total Conquistado: 80 pontos
+      </div>
+      <div class="finish-buttons-group">
+        <button type="button" class="btn-comic-primary" id="btn-restart">Jogar Novamente ↻</button>
+        <a href="jogo_c.html" class="btn-comic-secondary" style="width: 100%;">Avançar para o Jogo 3: Dominó →</a>
+      </div>
+    </section>
+
+    <footer class="horizonte-footer">
+      Coleção Horizonte · Matemática das Frações
+    </footer>
+  </main>
+
+  <script src="shared.js"></script>
+  <script>
+    const TOTAL_ROUNDS = 8;
+    const CHALLENGES = [
+      { numerator: 1, denominator: 2, shapes: ['bar', 'grid', 'bar'] },
+      { numerator: 2, denominator: 3, shapes: ['bar', 'grid', 'bar'] },
+      { numerator: 3, denominator: 4, shapes: ['grid', 'bar', 'grid'] },
+      { numerator: 2, denominator: 5, shapes: ['bar', 'bar', 'grid'] },
+      { numerator: 5, denominator: 6, shapes: ['grid', 'bar', 'grid'] },
+      { numerator: 3, denominator: 8, shapes: ['grid', 'grid', 'bar'] },
+      { numerator: 4, denominator: 7, shapes: ['bar', 'bar', 'grid'] },
+      { numerator: 7, denominator: 10, shapes: ['grid', 'bar', 'grid'] }
+    ];
+
+    let currentRound = 0;
+    let score = 0;
+    let isSolved = false;
+
+    // Inicializa HUD
+    HorizonteNav.init({ activeGame: 'b' });
+
+    function createSvg(tag, attrs) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        el.setAttribute(k, v);
+      }
+      return el;
+    }
+
+    // Desenha malhas ou barras geométricas ricas
+    function drawFigureSvg(painted, total, type = 'bar') {
+      const svg = createSvg('svg', {
+        viewBox: '0 0 200 120',
+        role: 'img',
+        'aria-label': `${painted} de ${total} partes coloridas`
+      });
+
+      if (type === 'grid') {
+        const cols = total <= 4 ? 2 : total <= 6 ? 3 : total <= 8 ? 4 : 5;
+        const rows = Math.ceil(total / cols);
+        const cellW = (180 - (cols - 1) * 4) / cols;
+        const cellH = (100 - (rows - 1) * 4) / rows;
+        const startX = 10;
+        const startY = 10;
+
+        for (let i = 0; i < total; i++) {
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          const x = startX + col * (cellW + 4);
+          const y = startY + row * (cellH + 4);
+          const isPainted = i < painted;
+
+          const rect = createSvg('rect', {
+            x, y, width: cellW, height: cellH, rx: '4',
+            fill: isPainted ? '#f28c4b' : '#fffdf5',
+            stroke: '#142d3d',
+            'stroke-width': '2'
+          });
+          svg.appendChild(rect);
+
+          if (isPainted) {
+            const dot = createSvg('circle', {
+              cx: x + cellW / 2,
+              cy: y + cellH / 2,
+              r: '4',
+              fill: '#142d3d'
+            });
+            svg.appendChild(dot);
+          }
+        }
+      } else {
+        // Barra horizontal dividida
+        const barW = 180;
+        const barH = 54;
+        const x = 10;
+        const y = 33;
+        const segW = barW / total;
+
+        for (let i = 0; i < total; i++) {
+          const isPainted = i < painted;
+          const rect = createSvg('rect', {
+            x: x + i * segW,
+            y,
+            width: segW,
+            height: barH,
+            rx: i === 0 ? '6' : (i === total - 1 ? '6' : '0'),
+            fill: isPainted ? '#f28c4b' : '#fffdf5',
+            stroke: '#142d3d',
+            'stroke-width': '2'
+          });
+          svg.appendChild(rect);
+
+          if (isPainted) {
+            const dot = createSvg('circle', {
+              cx: x + i * segW + segW / 2,
+              cy: y + barH / 2,
+              r: '4',
+              fill: '#142d3d'
+            });
+            svg.appendChild(dot);
+          }
+        }
+      }
+
+      return svg;
+    }
+
+    function generateFigureOptions(target) {
+      const { numerator, denominator } = target;
+      const options = [
+        { painted: numerator, total: denominator, type: 'grid', isCorrect: true }
+      ];
+
+      // Opções distratoras inteligentes
+      // Distrator 1: Mesmo total, numerador invertido ou diferente
+      let wrongP1 = denominator - numerator;
+      if (wrongP1 === numerator) wrongP1 = (numerator > 1) ? numerator - 1 : numerator + 1;
+      options.push({ painted: wrongP1, total: denominator, type: 'bar', isCorrect: false });
+
+      // Distrator 2: Numerador igual, denominador diferente
+      let wrongD = denominator === 4 ? 3 : denominator === 2 ? 3 : denominator - 1;
+      if (wrongD <= numerator) wrongD = denominator + 2;
+      options.push({ painted: Math.min(numerator, wrongD - 1), total: wrongD, type: 'grid', isCorrect: false });
+
+      return options.sort(() => Math.random() - 0.5);
+    }
+
+    function loadRound() {
+      isSolved = false;
+      document.getElementById('btn-next').style.display = 'none';
+
+      const challenge = CHALLENGES[currentRound];
+      const { numerator, denominator } = challenge;
+
+      // Atualiza fração alvo
+      document.getElementById('target-num').textContent = numerator;
+      document.getElementById('target-den').textContent = denominator;
+
+      // Progresso
+      const pct = (currentRound / TOTAL_ROUNDS) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+      document.getElementById('round-indicator').textContent = `Desafio ${currentRound + 1} de ${TOTAL_ROUNDS}`;
+
+      // Mascote
+      const mascotBox = document.getElementById('mascot-box');
+      mascotBox.className = 'mascot-feedback-box';
+      document.getElementById('mascot-speech').textContent = 
+        `Procure a figura dividida em ${denominator} partes iguais, com exatamente ${numerator} partes laranjas!`;
+
+      // Renderiza Figuras
+      const container = document.getElementById('figures-container');
+      container.innerHTML = '';
+
+      const options = generateFigureOptions(challenge);
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'figure-option-btn';
+        btn.setAttribute('aria-label', `Figura com ${opt.painted} partes pintadas de ${opt.total}`);
+
+        const svg = drawFigureSvg(opt.painted, opt.total, opt.type);
+        btn.appendChild(svg);
+
+        const caption = document.createElement('span');
+        caption.className = 'figure-caption';
+        caption.textContent = `${opt.painted} de ${opt.total} partes`;
+        btn.appendChild(caption);
+
+        btn.addEventListener('click', () => handleChoice(opt, btn, challenge));
+        container.appendChild(btn);
+      });
+    }
+
+    function handleChoice(option, btn, target) {
+      if (isSolved) return;
+
+      const mascotBox = document.getElementById('mascot-box');
+      const speech = document.getElementById('mascot-speech');
+
+      if (option.isCorrect) {
+        isSolved = true;
+        score += 10;
+        HorizonteNav.updateScore(score);
+        HorizonteAudio.playCorrect();
+
+        btn.classList.add('correct');
+        mascotBox.className = 'mascot-feedback-box correct';
+        speech.innerHTML = `<strong>Perfeito!</strong> Esta figura tem exatamente ${target.numerator} partes coloridas de um total de ${target.denominator}!`;
+
+        document.querySelectorAll('.figure-option-btn').forEach(b => b.disabled = true);
+
+        const btnNext = document.getElementById('btn-next');
+        btnNext.textContent = (currentRound === TOTAL_ROUNDS - 1) ? 'Concluir Desafio ★' : 'Próximo Desafio →';
+        btnNext.style.display = 'inline-flex';
+        btnNext.focus();
+      } else {
+        HorizonteAudio.playWrong();
+        btn.classList.remove('wrong');
+        void btn.offsetWidth;
+        btn.classList.add('wrong');
+        mascotBox.className = 'mascot-feedback-box wrong';
+        speech.textContent = `Ainda não! Essa figura mostra ${option.painted}/${option.total}. Estamos procurando ${target.numerator}/${target.denominator}. Continue tentando!`;
+      }
+    }
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+      HorizonteAudio.playClick();
+      currentRound++;
+      if (currentRound >= TOTAL_ROUNDS) {
+        showFinish();
+      } else {
+        loadRound();
+      }
+    });
+
+    function showFinish() {
+      document.getElementById('game-section').style.display = 'none';
+      document.getElementById('finish-section').style.display = 'block';
+      document.getElementById('finish-score-text').textContent = `★ Total Conquistado: ${score} pontos!`;
+      HorizonteAudio.playFanfare();
+      HorizonteFX.celebrate();
+    }
+
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      HorizonteAudio.playClick();
+      currentRound = 0;
+      score = 0;
+      HorizonteNav.updateScore(score);
+      document.getElementById('finish-section').style.display = 'none';
+      document.getElementById('game-section').style.display = 'block';
+      loadRound();
+    });
+
+    loadRound();
+  </script>
+</body>
+</html>

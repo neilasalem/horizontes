@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jogo 3 · Dominó das Frações — Coleção Horizonte</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>
+  :root {
+    --ink: #142d3d;
+    --cyan: #009cc3;
+    --cyan-light: #52cbe5;
+    --cyan-dark: #07718e;
+    --paper: #fffef8;
+    --yellow: #ffd166;
+    --yellow-light: #fff2bf;
+    --orange: #f28c4b;
+    --green: #2a9d8f;
+    --green-light: #d8f3ee;
+    --red: #e63946;
+    --red-light: #ffe0e3;
+    --border: 3px solid var(--ink);
+    --shadow: 5px 5px 0 var(--ink);
+    --shadow-lg: 8px 8px 0 var(--ink);
+    --shadow-sm: 3px 3px 0 var(--ink);
+    --font-heading: 'Fredoka', cursive, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 16px 16px 40px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    background-color: var(--cyan);
+    background-image:
+      radial-gradient(var(--cyan-light) 15%, transparent 16%),
+      radial-gradient(rgba(255, 255, 255, 0.14) 15%, transparent 16%),
+      linear-gradient(180deg, #009cc3 0%, #066782 100%);
+    background-size: 26px 26px, 26px 26px, 100% 100%;
+    background-position: 0 0, 13px 13px, 0 0;
+    background-attachment: fixed;
+    line-height: 1.5;
+  }
+
+  main { max-width: 960px; margin: auto; }
+
+  header {
+    position: relative;
+    padding: 16px 8px 24px;
+    text-align: center;
+  }
+
+  .top-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  /* BOTÃO VOLTAR À PÁGINA INICIAL */
+  .btn-home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn-home-link:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ink);
+    background: #ffe07a;
+  }
+
+  .collection {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  .btn-sound {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  h1 {
+    margin: 8px 0;
+    color: var(--paper);
+    font-family: var(--font-heading);
+    font-size: clamp(2.3rem, 6.5vw, 4.4rem);
+    font-weight: 800;
+    line-height: .95;
+    text-transform: uppercase;
+    text-shadow:
+      4px 4px 0 var(--ink),
+      -2px -2px 0 var(--ink),
+      2px -2px 0 var(--ink),
+      -2px 2px 0 var(--ink),
+      6px 6px 0 rgba(0, 0, 0, 0.35);
+  }
+
+  header p {
+    max-width: 640px;
+    margin: 10px auto 0;
+    color: var(--paper);
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-shadow: 1px 1px 2px rgba(20, 45, 61, 0.7);
+  }
+
+  .board {
+    position: relative;
+    padding: clamp(20px, 4vw, 36px);
+    border: var(--border);
+    border-radius: 24px;
+    background: var(--paper);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .board::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 90px;
+    height: 90px;
+    background: var(--orange);
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+    content: "";
+    pointer-events: none;
+  }
+
+  .status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .status span:last-child {
+    background: var(--yellow-light);
+    border: 2px solid var(--ink);
+    padding: 4px 12px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  progress {
+    display: block;
+    width: 100%;
+    height: 16px;
+    margin: 12px 0 22px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    overflow: hidden;
+    background: #d9eee9;
+    accent-color: var(--orange);
+  }
+
+  progress::-webkit-progress-bar { background: #d9eee9; }
+  progress::-webkit-progress-value { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+
+  h2 {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: clamp(1.3rem, 3.2vw, 1.85rem);
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .caption {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #4b6373;
+    margin-bottom: 16px;
+  }
+
+  /* PEÇA DE DOMINÓ */
+  .domino {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 620px;
+    min-height: 190px;
+    margin: 16px auto 26px;
+    border: 4px solid var(--ink);
+    border-radius: 20px;
+    background: var(--yellow);
+    box-shadow: 7px 7px 0 var(--ink);
+    overflow: hidden;
+  }
+
+  .half {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .half + .half {
+    border-left: 4px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .half svg {
+    width: 100%;
+    max-width: 180px;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.15));
+  }
+
+  .blank {
+    color: var(--cyan-dark);
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 800;
+    animation: bounce 2s infinite;
+  }
+
+  .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-heading);
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .fraction span:first-child {
+    min-width: 44px;
+    padding-bottom: 5px;
+    border-bottom: 3px solid currentColor;
+    text-align: center;
+  }
+
+  .fraction span:last-child {
+    padding-top: 5px;
+    text-align: center;
+  }
+
+  /* OPÇÕES DE DOMINÓ */
+  .options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .option {
+    min-height: 165px;
+    padding: 12px 10px;
+    border: 3px solid #b6d8d1;
+    border-radius: 18px;
+    background: #f7fffa;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform .18s, background .18s, box-shadow .18s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+  }
+
+  .option:hover:not(:disabled) {
+    transform: translate(-3px, -3px);
+    background: #fff4cf;
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .option:disabled { cursor: default; }
+
+  .option svg {
+    display: block;
+    width: 100%;
+    max-width: 140px;
+    margin: 0 auto 6px;
+  }
+
+  .option.correct {
+    border-color: var(--green);
+    background: var(--green-light);
+    box-shadow: 4px 4px 0 var(--green);
+  }
+
+  .option.wrong {
+    border-color: var(--red);
+    background: var(--red-light);
+    animation: shake .3s ease;
+  }
+
+  .option[draggable="true"] { cursor: grab; }
+  .option.dragging { opacity: .45; transform: rotate(2deg); }
+  .drop-zone { border: 3px dashed var(--cyan-dark); transition: background .18s, transform .18s; }
+  .drop-zone.drag-over { background: #d9f3f5; transform: scale(1.02); }
+
+  /* FEEDBACK COM MASCOTE */
+  .feedback-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin: 20px 0 16px;
+    padding: 14px 18px;
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--yellow-light);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+
+  .mascot-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    overflow: hidden;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  .mascot-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .feedback-text {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tip {
+    padding: 16px;
+    border: 2px dashed var(--cyan-dark);
+    border-radius: 16px;
+    background: #eef8ed;
+    line-height: 1.5;
+    font-size: 0.95rem;
+    margin-top: 14px;
+  }
+
+  .primary {
+    width: 100%;
+    margin-top: 16px;
+    padding: 16px;
+    border: var(--border);
+    border-radius: 16px;
+    background: var(--cyan-dark);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .primary:hover {
+    background: var(--cyan);
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+
+  .finish { text-align: center; }
+  .finish h2 { font-size: 2.2rem; }
+  .finish p { line-height: 1.7; max-width: 580px; margin: 10px auto; }
+
+  footer {
+    padding: 24px 8px;
+    color: var(--paper);
+    text-align: center;
+    font-weight: 600;
+    font-size: .95rem;
+    text-shadow: 1px 1px 2px rgba(20, 45, 61, 0.7);
+  }
+
+  [hidden] { display: none !important; }
+
+  @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  @media (max-width: 620px) {
+    .options { grid-template-columns: 1fr; }
+    .option { flex-direction: row; justify-content: space-around; min-height: 100px; }
+    .domino { min-height: 150px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="top-nav-bar">
+      <a class="btn-home-link" href="index.html">
+        <span>🏠</span>
+        <span>Voltar à Página Inicial</span>
+      </a>
+      <span class="collection">Coleção Horizonte · Matemática</span>
+      <button class="btn-sound" id="btn-sound" type="button" title="Alternar som">🔊</button>
+    </div>
+
+    <h1>Dominó das Frações</h1>
+    <p>A computação colocou uma peça. Encaixe uma representação equivalente para continuar o caminho.</p>
+  </header>
+
+  <section class="board" id="game" aria-label="Dominó de frações">
+    <div class="status">
+      <span id="round">Desafio 1 de 8</span>
+      <span id="score">★ 0 pontos</span>
+    </div>
+
+    <progress id="progress" max="8" value="0" aria-label="Desafios concluídos"></progress>
+    <h2 id="question" tabindex="-1">Qual gráfico equivalente continua o dominó?</h2>
+    <p class="caption">As cores mudam, mas a proporção precisa continuar igual.</p>
+
+    <div class="domino" id="computer-domino" role="img" aria-label="Peça de dominó do computador"></div>
+    <div class="options" id="options" role="group" aria-label="Escolha um gráfico equivalente"></div>
+
+    <div class="feedback-box">
+      <div class="mascot-avatar">
+        <img src="assets/robot_avatar.jpg" alt="Robô Amigo">
+      </div>
+      <div class="feedback-text" id="feedback" role="status" aria-atomic="true">
+        Observe a peça e procure a mesma proporção em outra divisão.
+      </div>
+    </div>
+
+    <button class="primary" id="next" hidden>Próximo desafio →</button>
+    <aside class="tip">
+      <strong>Regra do dominó:</strong><br>
+      Compare a parte colorida com o círculo inteiro. Frações equivalentes mostram a mesma proporção, mesmo com divisões diferentes.
+    </aside>
+  </section>
+
+  <section class="board finish" id="finish" hidden>
+    <div style="display: flex; justify-content: center; gap: 14px; margin-bottom: 14px;">
+      <div style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--ink); overflow: hidden;">
+        <img src="assets/robot_avatar.jpg" alt="Robô" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+    </div>
+    <h2 id="finish-title" tabindex="-1">Caminho do Dominó Completo!</h2>
+    <p id="summary"></p>
+    <p>Você comparou representações e dominou o conceito de frações equivalentes.</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 18px;">
+      <button class="primary" id="restart" style="max-width: 250px;">Recomeçar o dominó ↻</button>
+      <a class="btn-home-link" href="index.html" style="padding: 14px 22px; font-size: 1.05rem;">🏠 Voltar ao Início</a>
+    </div>
+  </section>
+
+  <footer>Coleção Horizonte · Aprender é abrir caminhos. Continue investigando.</footer>
+</main>
+
+<script>
+  // SISTEMA DE ÁUDIO SINTETIZADO
+  const AudioFX = (() => {
+    let ctx = null;
+    let muted = localStorage.getItem('horizonte_muted') === 'true';
+
+    function initCtx() {
+      if (!ctx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) ctx = new AudioClass();
+      }
+      if (ctx && ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+
+    function tone(freq, type, dur, gainVal = 0.1) {
+      if (muted) return;
+      try {
+        const c = initCtx();
+        if (!c) return;
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, c.currentTime);
+        g.gain.setValueAtTime(gainVal, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+        osc.connect(g);
+        g.connect(c.destination);
+        osc.start();
+        osc.stop(c.currentTime + dur);
+      } catch (e) {}
+    }
+
+    return {
+      isMuted: () => muted,
+      toggleMute: () => {
+        muted = !muted;
+        localStorage.setItem('horizonte_muted', muted);
+        return muted;
+      },
+      click: () => tone(450, 'triangle', 0.08, 0.06),
+      correct: () => {
+        if (muted) return;
+        [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 'triangle', 0.2, 0.12), i * 75));
+      },
+      wrong: () => {
+        if (muted) return;
+        tone(260, 'sawtooth', 0.15, 0.09);
+        setTimeout(() => tone(200, 'sawtooth', 0.2, 0.09), 120);
+      }
+    };
+  })();
+
+  const soundBtn = document.getElementById('btn-sound');
+  soundBtn.textContent = AudioFX.isMuted() ? '🔇' : '🔊';
+  soundBtn.addEventListener('click', () => {
+    const isMuted = AudioFX.toggleMute();
+    soundBtn.textContent = isMuted ? '🔇' : '🔊';
+    if (!isMuted) AudioFX.click();
+  });
+
+  const $ = id => document.getElementById(id);
+  const levels = [2, 3, 4, 5, 6, 8, 10, 12];
+  const colors = [
+    ['#f28c4b', '#fff8e8'],
+    ['#e63946', '#e9f5db'],
+    ['#ffd166', '#d9f3f5'],
+    ['#2a9d8f', '#fff0d2']
+  ];
+  let round = 0, score = 0, numerator = 0, denominator = 0, solved = false, previous = '';
+
+  function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+  }
+
+  function svgElement(tag, attributes) {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attributes).forEach(([name, value]) => node.setAttribute(name, value));
+    return node;
+  }
+
+  function pie(painted, total, palette) {
+    const svg = svgElement('svg', { viewBox: '0 0 220 220', 'aria-hidden': 'true', focusable: 'false' });
+    svg.appendChild(svgElement('circle', { cx: 110, cy: 110, r: 96, fill: palette[1], stroke: '#142d3d', 'stroke-width': 3 }));
+    for (let i = 0; i < total; i++) {
+      const start = i * 2 * Math.PI / total - Math.PI / 2;
+      const end = (i + 1) * 2 * Math.PI / total - Math.PI / 2;
+      const middle = (start + end) / 2;
+      const x1 = 110 + 92 * Math.cos(start);
+      const y1 = 110 + 92 * Math.sin(start);
+      const x2 = 110 + 92 * Math.cos(end);
+      const y2 = 110 + 92 * Math.sin(end);
+      svg.appendChild(svgElement('path', {
+        d: `M110 110 L${x1} ${y1} A92 92 0 0 1 ${x2} ${y2} Z`,
+        fill: i < painted ? palette[0] : palette[1],
+        stroke: '#142d3d',
+        'stroke-width': 2
+      }));
+      if (i < painted) {
+        svg.appendChild(svgElement('circle', { cx: 110 + 59 * Math.cos(middle), cy: 110 + 59 * Math.sin(middle), r: 5, fill: '#142d3d' }));
+      }
+    }
+    return svg;
+  }
+
+  function fractionText(fraction) {
+    return `<span class="fraction" aria-hidden="true"><span>${fraction.numerator}</span><span>${fraction.denominator}</span></span>`;
+  }
+
+  function renderPiece(container, fraction) {
+    container.replaceChildren();
+    const left = document.createElement('div');
+    left.className = 'half';
+    left.setAttribute('aria-label', `Fração ${fraction.numerator} sobre ${fraction.denominator}`);
+    left.appendChild(pie(fraction.numerator, fraction.denominator, colors[0]));
+    left.insertAdjacentHTML('beforeend', fractionText(fraction));
+    const right = document.createElement('div');
+    right.className = 'half drop-zone';
+    right.innerHTML = '<span class="blank" aria-hidden="true">?</span>';
+    right.setAttribute('aria-label', 'Lado de conexão');
+    container.append(left, right);
+  }
+
+  function same(first, second) {
+    return first.numerator * second.denominator === second.numerator * first.denominator;
+  }
+
+  function renderRound(focus = false) {
+    solved = false;
+    $('next').hidden = true;
+    denominator = levels[round];
+    do {
+      numerator = 1 + Math.floor(Math.random() * (denominator - 1));
+    } while (`${numerator}/${denominator}` === previous);
+    previous = `${numerator}/${denominator}`;
+
+    $('round').textContent = `Desafio ${round + 1} de ${levels.length}`;
+    $('score').textContent = `★ ${score} pontos`;
+    $('progress').value = round;
+    $('feedback').textContent = 'Observe o dominó e procure a mesma proporção em outra divisão.';
+    renderPiece($('computer-domino'), { numerator, denominator });
+
+    $('options').replaceChildren();
+    shuffle([2, 3, 4]).forEach((factor, index) => {
+      const answer = { numerator: numerator * factor, denominator: denominator * factor };
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      button.appendChild(pie(answer.numerator, answer.denominator, colors[(index + 1) % colors.length]));
+      button.insertAdjacentHTML('beforeend', fractionText(answer));
+      button.setAttribute('aria-label', `Gráfico com ${answer.numerator} sobre ${answer.denominator}`);
+      button.addEventListener('click', () => check(answer, button));
+      $('options').appendChild(button);
+    });
+
+    if (focus) $('question').focus();
+  }
+
+  function check(answer, button) {
+    if (solved) return;
+    if (!same(answer, { numerator, denominator })) {
+      AudioFX.wrong();
+      button.classList.remove('wrong');
+      void button.offsetWidth;
+      button.classList.add('wrong');
+      $('feedback').textContent = 'Ainda não. A cor ocupa uma parte diferente do círculo. Compare a proporção!';
+      return;
+    }
+    solved = true;
+    score += 10;
+    AudioFX.correct();
+    button.classList.add('correct');
+    keepPlacedPiece(button);
+    document.querySelectorAll('.option').forEach(option => option.disabled = true);
+    $('score').textContent = `★ ${score} pontos`;
+    $('progress').value = round + 1;
+    $('feedback').textContent = `Muito bem! ${numerator}/${denominator} e ${answer.numerator}/${answer.denominator} mostram a mesma proporção.`;
+    $('next').textContent = round === levels.length - 1 ? 'Ver conquista ★' : 'Próximo desafio →';
+    $('next').hidden = false;
+    $('next').focus();
+  }
+
+  function keepPlacedPiece(button) {
+    const zone = document.querySelector('#computer-domino .drop-zone');
+    if (!zone || zone.dataset.placed) return;
+    const graphic = button.querySelector('svg');
+    const fraction = button.querySelector('.fraction');
+    if (!graphic && !fraction) return;
+    zone.replaceChildren();
+    if (graphic) zone.appendChild(graphic.cloneNode(true));
+    if (fraction) zone.appendChild(fraction.cloneNode(true));
+    zone.dataset.placed = 'true';
+    zone.setAttribute('aria-label', 'Peça encaixada corretamente');
+    zone.classList.remove('drop-zone', 'drag-over');
+  }
+
+  function enableDragDrop() {
+    document.querySelectorAll('#options .option').forEach((button, index) => {
+      if (button.dataset.dragReady) return;
+      button.dataset.dragReady = 'true';
+      button.draggable = true;
+      button.addEventListener('dragstart', event => {
+        event.dataTransfer.setData('text/plain', String(index));
+        button.classList.add('dragging');
+      });
+      button.addEventListener('dragend', () => button.classList.remove('dragging'));
+    });
+
+    const zone = document.querySelector('#computer-domino .half:last-child');
+    if (!zone || zone.dataset.dropReady) return;
+    zone.dataset.dropReady = 'true';
+    zone.classList.add('drop-zone');
+    zone.addEventListener('dragover', event => {
+      event.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', event => {
+      event.preventDefault();
+      zone.classList.remove('drag-over');
+      const button = document.querySelectorAll('#options .option')[Number(event.dataTransfer.getData('text/plain'))];
+      if (button) button.click();
+    });
+  }
+
+  const dragObserver = new MutationObserver(enableDragDrop);
+  dragObserver.observe(document.getElementById('options'), { childList: true });
+  dragObserver.observe(document.getElementById('computer-domino'), { childList: true });
+
+  let fixedRound = '';
+  function addDominoDistractors() {
+    const key = `${round}-${numerator}/${denominator}`;
+    if (fixedRound === key) return;
+    fixedRound = key;
+    const options = document.getElementById('options');
+    const correct = { numerator: numerator * 2, denominator: denominator * 2 };
+    const nearNumerator = numerator === 1 ? 2 : numerator - 1;
+    const choices = shuffle([correct, { numerator: nearNumerator, denominator }, { numerator, denominator: denominator + 1 }]);
+    options.replaceChildren();
+    choices.forEach((answer, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      button.appendChild(pie(answer.numerator, answer.denominator, colors[(index + 1) % colors.length]));
+      button.insertAdjacentHTML('beforeend', fractionText(answer));
+      button.setAttribute('aria-label', `Gráfico com ${answer.numerator} sobre ${answer.denominator}`);
+      button.addEventListener('click', () => check(answer, button));
+      options.appendChild(button);
+    });
+  }
+
+  let representationRound = '';
+  function renderAlternatingRepresentation() {
+    const key = `${round}-${numerator}/${denominator}`;
+    if (representationRound === key) return;
+    representationRound = key;
+    const target = { numerator, denominator };
+    const targetHalf = document.querySelector('#computer-domino .half:first-child');
+    const numericTarget = round % 2 === 0;
+
+    if (numericTarget) {
+      targetHalf.replaceChildren();
+      targetHalf.insertAdjacentHTML('beforeend', fractionText(target));
+      targetHalf.setAttribute('aria-label', `Fração ${numerator} sobre ${denominator}`);
+      document.getElementById('question').textContent = 'Qual gráfico representa esta fração?';
+      document.querySelector('.caption').textContent = 'A peça mostra a fração. Arraste o gráfico que representa a mesma parte do todo.';
+    } else {
+      targetHalf.replaceChildren();
+      targetHalf.appendChild(pie(target.numerator, target.denominator, colors[0]));
+      document.getElementById('question').textContent = 'Qual fração representa este gráfico?';
+      document.querySelector('.caption').textContent = 'A peça mostra o gráfico. Arraste a fração que representa a mesma parte do todo.';
+    }
+
+    const options = document.getElementById('options');
+    const correct = { numerator: numerator * 2, denominator: denominator * 2 };
+    const nearNumerator = numerator === 1 ? 2 : numerator - 1;
+    const choices = shuffle([correct, { numerator: nearNumerator, denominator }, { numerator, denominator: denominator + 1 }]);
+    options.replaceChildren();
+    choices.forEach((answer, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'option';
+      if (numericTarget) {
+        button.appendChild(pie(answer.numerator, answer.denominator, colors[(index + 1) % colors.length]));
+      }
+      button.insertAdjacentHTML('beforeend', fractionText(answer));
+      button.setAttribute('aria-label', numericTarget ? `Gráfico com ${answer.numerator} sobre ${answer.denominator}` : `Fração ${answer.numerator} sobre ${answer.denominator}`);
+      button.addEventListener('click', () => check(answer, button));
+      options.appendChild(button);
+    });
+  }
+
+  const representationObserver = new MutationObserver(renderAlternatingRepresentation);
+  representationObserver.observe(document.getElementById('options'), { childList: true });
+
+  $('next').addEventListener('click', () => {
+    AudioFX.click();
+    round++;
+    if (round === levels.length) {
+      $('game').hidden = true;
+      $('finish').hidden = false;
+      $('summary').textContent = `Você completou ${levels.length} desafios e conquistou ${score} pontos.`;
+      $('finish-title').focus();
+    } else {
+      renderRound(true);
+    }
+  });
+
+  $('restart').addEventListener('click', () => {
+    AudioFX.click();
+    round = 0;
+    score = 0;
+    previous = '';
+    $('finish').hidden = true;
+    $('game').hidden = false;
+    renderRound(true);
+  });
+
+  renderRound();
+</script>
+</body>
+</html>
