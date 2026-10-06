@@ -472,45 +472,43 @@
         counterVal.title = 'O GoatCounter não registra visitas em localhost. Em produção, o contador será atualizado automaticamente.';
       } else {
         let attempts = 0;
-        const loadGoatCount = () => {
-          if (!window.goatcounter || !window.goatcounter.get_data) {
+        const loadVisitCount = () => {
+          if (!window.goatcounter || !window.goatcounter.visit_count) {
             attempts += 1;
             if (attempts < 40) {
-              setTimeout(loadGoatCount, 250);
+              setTimeout(loadVisitCount, 250);
             } else {
-              console.error('GoatCounter não carregou; não foi possível determinar a rota para o contador.');
+              console.error('GoatCounter não carregou; não foi possível exibir o total de visitas.');
               counterVal.textContent = '—';
             }
             return;
           }
 
-          const path = window.goatcounter.get_data().p;
-          const counterUrl = new URL(
-            `https://pmacedo1983.goatcounter.com/counter/${encodeURIComponent(path)}.json`
-          );
-          counterUrl.searchParams.set('_', Date.now().toString());
-
-          fetch(counterUrl, { cache: 'no-store' })
-            .then(response => {
-              if (!response.ok) {
-                throw new Error(`GoatCounter respondeu HTTP ${response.status}`);
+          counterVal.replaceChildren();
+          window.goatcounter.visit_count({
+            append: '#access-counter-val',
+            path: 'TOTAL',
+            no_branding: true,
+            attr: { width: '72', height: '36' },
+            style: `
+              div {
+                width: 72px;
+                height: 36px;
+                border: 0;
+                background: transparent;
+                color: #142d3d;
+                font-family: sans-serif;
               }
-              return response.json();
-            })
-            .then(data => {
-              if (typeof data.count !== 'string') {
-                throw new Error('Resposta do GoatCounter sem o campo count');
+              #gcvc-for { display: none; }
+              #gcvc-views {
+                font-size: 16px;
+                font-weight: 800;
               }
-              counterVal.textContent = data.count;
-            })
-            .catch(error => {
-              console.error('Não foi possível carregar o contador do GoatCounter:', error);
-              counterVal.textContent = '—';
-              counterVal.title = 'Não foi possível carregar o contador de visitantes.';
-            });
+            `
+          });
         };
 
-        loadGoatCount();
+        loadVisitCount();
       }
     }
   </script>
