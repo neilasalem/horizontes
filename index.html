@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -118,11 +119,11 @@
     }
 
     .access-counter {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      width: fit-content;
+      width: min(100%, 420px);
       max-width: 100%;
       margin: 0 auto 30px;
       padding: 10px 20px;
@@ -139,10 +140,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 36px;
+      min-width: 52px;
       padding: 3px 12px;
       background: var(--horizon-blue);
-      color: #fff;
+      color: #3f5564;
       border-radius: 12px;
       border: 2px solid var(--horizon-ink);
       font-size: 1rem;
@@ -185,10 +186,21 @@
       transition: transform 0.2s ease;
     }
 
-    .game-card.card-pizza::after { background: var(--horizon-orange); }
-    .game-card.card-figures::after { background: var(--horizon-cyan); }
-    .game-card.card-domino::after { background: var(--horizon-yellow); }
-    .game-card.card-grocery::after { background: var(--horizon-green); }
+    .game-card.card-pizza::after {
+      background: var(--horizon-orange);
+    }
+
+    .game-card.card-figures::after {
+      background: var(--horizon-cyan);
+    }
+
+    .game-card.card-domino::after {
+      background: var(--horizon-yellow);
+    }
+
+    .game-card.card-grocery::after {
+      background: var(--horizon-green);
+    }
 
     .game-card:hover {
       transform: translate(-4px, -4px);
@@ -219,10 +231,21 @@
       flex-shrink: 0;
     }
 
-    .card-pizza .game-icon-box { background: var(--horizon-orange-light); }
-    .card-figures .game-icon-box { background: #dff6fa; }
-    .card-domino .game-icon-box { background: var(--horizon-yellow-light); }
-    .card-grocery .game-icon-box { background: var(--horizon-green-light); }
+    .card-pizza .game-icon-box {
+      background: var(--horizon-orange-light);
+    }
+
+    .card-figures .game-icon-box {
+      background: #dff6fa;
+    }
+
+    .card-domino .game-icon-box {
+      background: var(--horizon-yellow-light);
+    }
+
+    .card-grocery .game-icon-box {
+      background: var(--horizon-green-light);
+    }
 
     .game-card-title {
       font-family: var(--font-heading);
@@ -287,31 +310,36 @@
       .hero-banner-card {
         grid-template-columns: 1fr;
       }
+
       .hero-banner-image-wrapper {
         border-right: none;
         border-bottom: 3px solid var(--horizon-ink);
         height: 220px;
         min-height: auto;
       }
+
       .games-grid {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
+
 <body>
 
   <main class="portal-container">
     <!-- Banner Principal da Capa Horizonte -->
     <section class="hero-banner-card">
       <div class="hero-banner-image-wrapper">
-        <img src="assets/cover_banner.jpg" alt="Ilustração da capa Horizonte com o Robô e a Garota exploradora na cidade moderna">
+        <img src="assets/cover_banner.jpg"
+          alt="Ilustração da capa Horizonte com o Robô e a Garota exploradora na cidade moderna">
       </div>
       <div class="hero-banner-content">
         <span class="hero-tag-badge">Coleção Horizonte · Matemática</span>
         <h1 class="hero-main-heading">Horizonte das Frações</h1>
         <p class="hero-description">
-          Aprenda frações de forma interativa, visual e divertida! Explore pizzas de frações, representações geométricas, dominós de equivalência e cálculos práticos do cotidiano.
+          Aprenda frações de forma interativa, visual e divertida! Explore pizzas de frações, representações
+          geométricas, dominós de equivalência e cálculos práticos do cotidiano.
         </p>
         <div class="hero-characters-row">
           <div class="hero-char-avatar">
@@ -329,7 +357,7 @@
 
     <!-- Grade dos 4 Jogos -->
     <section class="games-grid" aria-label="Menu de Jogos">
-      
+
       <!-- Jogo 1 -->
       <a href="jogo_a.html" class="game-card card-pizza">
         <div>
@@ -361,7 +389,8 @@
             </div>
           </div>
           <p class="game-card-desc">
-            Dada uma fração numérica em destaque, descubra qual das malhas geométricas e figuras representa exatamente esse valor.
+            Dada uma fração numérica em destaque, descubra qual das malhas geométricas e figuras representa exatamente
+            esse valor.
           </p>
         </div>
         <div class="game-card-footer">
@@ -381,7 +410,8 @@
             </div>
           </div>
           <p class="game-card-desc">
-            Conecte peças de dominó com a mesma proporção. Arraste ou clique na peça correspondente para avançar no caminho.
+            Conecte peças de dominó com a mesma proporção. Arraste ou clique na peça correspondente para avançar no
+            caminho.
           </p>
         </div>
         <div class="game-card-footer">
@@ -401,7 +431,8 @@
             </div>
           </div>
           <p class="game-card-desc">
-            Resolva situações do dia a dia com pacotes de farinha, arroz, leite e suco calculando partes de quantidades reais em gramas e mililitros.
+            Resolva situações do dia a dia com pacotes de farinha, arroz, leite e suco calculando partes de quantidades
+            reais em gramas e mililitros.
           </p>
         </div>
         <div class="game-card-footer">
@@ -414,7 +445,7 @@
 
     <aside class="access-counter" aria-label="Contador de visitantes da coleção">
       <span>👀 Visitantes da Coleção:</span>
-      <span class="access-counter-val" id="access-counter-val">...</span>
+      <div class="access-counter-val" id="access-counter-val" aria-live="polite">...</div>
     </aside>
 
     <footer class="horizonte-footer">
@@ -434,22 +465,53 @@
 
     const counterVal = document.getElementById('access-counter-val');
     if (counterVal) {
-      function loadGoatCount() {
-        fetch('https://pmacedo1983.goatcounter.com/counter/TOTAL.json')
-          .then(res => res.ok ? res.json() : Promise.reject(res.status))
-          .then(data => {
-            if (data && data.count) {
-              counterVal.textContent = data.count;
-            }
-          })
-          .catch(() => {
-            counterVal.textContent = '1+';
-          });
+      const hostname = window.location.hostname;
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        counterVal.textContent = 'local';
+        counterVal.title = 'O GoatCounter não registra visitas em localhost. Em produção, o contador será atualizado automaticamente.';
+      } else {
+        const ensureVisitCount = () => {
+          if (window.goatcounter && window.goatcounter.visit_count) {
+            counterVal.innerHTML = '';
+            window.goatcounter.visit_count({
+              append: '#access-counter-val',
+              path: 'TOTAL',
+              no_branding: true,
+              style: `
+                div {
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  min-width: 52px;
+                  padding: 3px 12px;
+                  background: var(--horizon-blue);
+                  color: #3f5564;
+                  border-radius: 12px;
+                  border: 2px solid var(--horizon-ink);
+                  font-family: var(--font-heading);
+                  font-size: 1rem;
+                  font-weight: 800;
+                  line-height: 1.2;
+                }
+              `
+            });
+            return;
+          }
+          setTimeout(ensureVisitCount, 250);
+        };
+
+        ensureVisitCount();
       }
-      loadGoatCount();
     }
   </script>
-  <script data-goatcounter="https://pmacedo1983.goatcounter.com/count"
-          async src="//gc.zgo.at/count.js"></script>
+  <script data-goatcounter="https://pmacedo1983.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
+</html>
+
+      }
+    }
+  </script>
+  <script data-goatcounter="https://pmacedo1983.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+
 </html>
