@@ -117,6 +117,38 @@
       color: var(--horizon-ink);
     }
 
+    .access-counter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto 30px;
+      padding: 10px 20px;
+      background: var(--horizon-paper);
+      border: var(--horizon-border);
+      border-radius: 16px;
+      box-shadow: var(--horizon-shadow);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--horizon-ink);
+    }
+
+    .access-counter-val {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      padding: 3px 12px;
+      background: var(--horizon-blue);
+      color: #fff;
+      border-radius: 12px;
+      border: 2px solid var(--horizon-ink);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
     /* Grade dos 4 Jogos */
     .games-grid {
       display: grid;
@@ -380,6 +412,11 @@
 
     </section>
 
+    <aside class="access-counter" aria-label="Contador de visitantes da coleção">
+      <span>👀 Visitantes da Coleção:</span>
+      <span class="access-counter-val" id="access-counter-val">...</span>
+    </aside>
+
     <footer class="horizonte-footer">
       Coleção Horizonte · Matemática das Frações
     </footer>
@@ -394,6 +431,25 @@
         HorizonteAudio.playClick();
       });
     });
+
+    const counterVal = document.getElementById('access-counter-val');
+    if (counterVal) {
+      function loadGoatCount() {
+        fetch('https://pmacedo1983.goatcounter.com/counter/TOTAL.json')
+          .then(res => res.ok ? res.json() : Promise.reject(res.status))
+          .then(data => {
+            if (data && data.count) {
+              counterVal.textContent = data.count;
+            }
+          })
+          .catch(() => {
+            counterVal.textContent = '1+';
+          });
+      }
+      loadGoatCount();
+    }
   </script>
+  <script data-goatcounter="https://pmacedo1983.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
