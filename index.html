@@ -120,10 +120,11 @@
 
     .access-counter {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      width: min(100%, 420px);
+      width: min(100%, 500px);
       max-width: 100%;
       margin: 0 auto 30px;
       padding: 10px 20px;
@@ -140,8 +141,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 52px;
-      padding: 3px 12px;
+      flex: 0 0 200px;
+      width: 200px;
+      height: 60px;
+      padding: 0;
       background: var(--horizon-cyan-light);
       color: var(--horizon-ink);
       border-radius: 12px;
@@ -149,6 +152,13 @@
       font-family: var(--font-heading);
       font-size: 1rem;
       font-weight: 800;
+    }
+
+    .access-counter-val iframe {
+      display: block;
+      width: 200px;
+      height: 60px;
+      border: 0;
     }
 
     /* Grade dos 4 Jogos */
@@ -489,11 +499,9 @@
             append: '#access-counter-val',
             path: 'TOTAL',
             no_branding: true,
-            attr: { width: '72', height: '36' },
+            attr: { width: '200', height: '60' },
             style: `
               div {
-                width: 72px;
-                height: 36px;
                 border: 0;
                 background: transparent;
                 color: #142d3d;
