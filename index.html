@@ -471,27 +471,27 @@
         counterVal.textContent = 'local';
         counterVal.title = 'O GoatCounter não registra visitas em localhost. Em produção, o contador será atualizado automaticamente.';
       } else {
-        const counterUrl = new URL('https://pmacedo1983.goatcounter.com/counter/TOTAL.json');
-        counterUrl.searchParams.set('_', Date.now().toString());
+        let attempts = 0;
+        const loadVisitCount = () => {
+          if (!window.goatcounter || !window.goatcounter.visit_count) {
+            attempts += 1;
+            if (attempts < 40) {
+              setTimeout(loadVisitCount, 250);
+            } else {
+              console.error('GoatCounter não carregou; não foi possível exibir o contador.');
+              counterVal.textContent = '—';
+            }
+            return;
+          }
 
-        fetch(counterUrl, { cache: 'no-store' })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`GoatCounter respondeu HTTP ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            if (typeof data.count !== 'string') {
-              throw new Error('Resposta do GoatCounter sem o campo count');
-            }
-            counterVal.textContent = data.count;
-          })
-          .catch(error => {
-            console.error('Não foi possível carregar o contador do GoatCounter:', error);
-            counterVal.textContent = '—';
-            counterVal.title = 'Não foi possível carregar o contador de visitantes.';
+          counterVal.replaceChildren();
+          window.goatcounter.visit_count({
+            append: '#access-counter-val',
+            path: 'TOTAL'
           });
+        };
+
+        loadVisitCount();
       }
     }
   </script>
