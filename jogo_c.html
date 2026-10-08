@@ -484,7 +484,8 @@
   <footer>Coleção Horizonte · Aprender é abrir caminhos. Continue investigando.</footer>
 </main>
 
-<script>
+<script src="tutor-tracker.js"></script>
+  <script>
   // SISTEMA DE ÁUDIO SINTETIZADO
   const AudioFX = (() => {
     let ctx = null;
@@ -616,6 +617,7 @@
   }
 
   function renderRound(focus = false) {
+      window.TutorActivity?.begin(round + 1);
     solved = false;
     $('next').hidden = true;
     denominator = levels[round];
@@ -648,6 +650,7 @@
 
   function check(answer, button) {
     if (solved) return;
+      window.TutorActivity?.answer(same(answer, { numerator, denominator }));
     if (!same(answer, { numerator, denominator })) {
       AudioFX.wrong();
       button.classList.remove('wrong');
@@ -812,3 +815,4 @@
         async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
+

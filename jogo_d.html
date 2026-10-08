@@ -258,6 +258,7 @@
     </footer>
   </main>
 
+  <script src="tutor-tracker.js"></script>
   <script src="shared.js"></script>
   <script>
     const CHALLENGES = [
@@ -371,6 +372,7 @@
     }
 
     function loadRound() {
+      window.TutorActivity?.begin(currentRound + 1);
       isSolved = false;
       document.getElementById('btn-next').style.display = 'none';
       document.getElementById('step-by-step').style.display = 'none';
@@ -421,6 +423,7 @@
 
     function handleChoice(val, correctVal, btn, data) {
       if (isSolved) return;
+      window.TutorActivity?.answer(val === correctVal);
 
       const mascotBox = document.getElementById('mascot-box');
       const speech = document.getElementById('mascot-speech');
@@ -493,3 +496,4 @@
           async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
+

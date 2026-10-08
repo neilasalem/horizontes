@@ -215,6 +215,7 @@
     </footer>
   </main>
 
+  <script src="tutor-tracker.js"></script>
   <script src="shared.js"></script>
   <script>
     const TOTAL_ROUNDS = 8;
@@ -343,6 +344,7 @@
     }
 
     function loadRound() {
+      window.TutorActivity?.begin(currentRound + 1);
       isSolved = false;
       document.getElementById('btn-next').style.display = 'none';
 
@@ -390,6 +392,7 @@
 
     function handleChoice(option, btn, target) {
       if (isSolved) return;
+      window.TutorActivity?.answer(option.isCorrect);
 
       const mascotBox = document.getElementById('mascot-box');
       const speech = document.getElementById('mascot-speech');
